@@ -1,0 +1,12 @@
+# 2. CONFIGMAP - non-sensitive configuration injected as env vars
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: task-manager
+data:
+  APP_ENV: "production"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "taskdb"
+  REDIS_HOST: "redis-service"

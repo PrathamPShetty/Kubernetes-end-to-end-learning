@@ -1,0 +1,20 @@
+# 16. NETWORK POLICY - only backend can talk to database
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-access-only-from-backend
+  namespace: task-manager
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: fastapi-backend
+    ports:
+    - protocol: TCP
+      port: 5432

@@ -1,0 +1,13 @@
+# 11. SERVICE (ClusterIP) - backend accessed by frontend via this
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: task-manager
+spec:
+  selector:
+    app: fastapi-backend
+  ports:
+  - port: 80
+    targetPort: 8000
+  type: ClusterIP

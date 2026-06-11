@@ -1,0 +1,13 @@
+# 7. SERVICE (ClusterIP) - internal-only access for database
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: task-manager
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP    # only accessible within the cluster

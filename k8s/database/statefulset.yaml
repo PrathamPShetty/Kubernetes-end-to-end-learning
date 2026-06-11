@@ -1,0 +1,64 @@
+# 6. STATEFULSET - for stateful apps like databases (stable network identity + storage)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: task-manager
+spec:
+  serviceName: "postgres-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        ports:
+        - containerPort: 5432
+        # Env from Secret
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: "taskdb"
+        # Volume mount for persistent data
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        # Resource limits
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        # Readiness probe - is it ready to accept connections?
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "admin", "-d", "taskdb"]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        # Liveness probe - is it still alive?
+        livenessProbe:
+          exec:
+            command: ["pg_isready", "-U", "admin", "-d", "taskdb"]
+          initialDelaySeconds: 15
+          periodSeconds: 20
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc

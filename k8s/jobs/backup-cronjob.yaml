@@ -1,0 +1,34 @@
+# 18. CRONJOB - scheduled database backup every day at midnight
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+  namespace: task-manager
+spec:
+  schedule: "0 0 * * *"    # midnight daily
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:16-alpine
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_PASSWORD
+            command:
+            - sh
+            - -c
+            - |
+              pg_dump -h postgres-service -U admin taskdb > /backup/taskdb-$(date +%Y%m%d).sql
+              echo "Backup completed at $(date)"
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-storage
+            emptyDir: {}

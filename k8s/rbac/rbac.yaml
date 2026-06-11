@@ -1,0 +1,35 @@
+# 19. RBAC - Role-Based Access Control
+# ServiceAccount for the backend
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backend-sa
+  namespace: task-manager
+
+---
+# 20. ROLE - defines what permissions are allowed
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: backend-role
+  namespace: task-manager
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+
+---
+# 21. ROLEBINDING - binds the role to the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: backend-rolebinding
+  namespace: task-manager
+subjects:
+- kind: ServiceAccount
+  name: backend-sa
+  namespace: task-manager
+roleRef:
+  kind: Role
+  name: backend-role
+  apiGroup: rbac.authorization.k8s.io

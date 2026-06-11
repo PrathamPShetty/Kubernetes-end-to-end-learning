@@ -1,0 +1,7 @@
+# 1. NAMESPACE - isolates resources in a virtual cluster
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: task-manager
+  labels:
+    app: task-manager

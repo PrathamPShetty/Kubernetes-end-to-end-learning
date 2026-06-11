@@ -1,0 +1,14 @@
+# 13. SERVICE (NodePort) - exposes frontend outside the cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: task-manager
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080    # accessible at <node-ip>:30080
+  type: NodePort

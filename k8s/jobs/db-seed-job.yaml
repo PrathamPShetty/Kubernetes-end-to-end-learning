@@ -1,0 +1,38 @@
+# 17. JOB - one-time task to seed the database with sample data
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-seed
+  namespace: task-manager
+spec:
+  ttlSecondsAfterFinished: 300   # auto-cleanup after 5 min
+  template:
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox:1.36
+        command: ['sh', '-c', 'until nc -z postgres-service 5432; do sleep 2; done']
+      containers:
+      - name: seed
+        image: postgres:16-alpine
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: DB_PASSWORD
+        command:
+        - sh
+        - -c
+        - |
+          psql -h postgres-service -U admin -d taskdb -c "
+            INSERT INTO tasks (title, description) VALUES
+              ('Learn Kubernetes Pods', 'Understand the smallest deployable unit'),
+              ('Learn Deployments', 'Manage ReplicaSets and rolling updates'),
+              ('Learn Services', 'ClusterIP, NodePort, LoadBalancer'),
+              ('Learn ConfigMaps & Secrets', 'Externalize configuration'),
+              ('Learn Ingress', 'Route external traffic to services')
+            ON CONFLICT DO NOTHING;
+          "
+      restartPolicy: Never
+  backoffLimit: 3

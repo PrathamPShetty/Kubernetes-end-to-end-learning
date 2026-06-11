@@ -1,0 +1,13 @@
+# 5. PERSISTENTVOLUMECLAIM - requests storage from a PV
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: task-manager
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 1Gi
