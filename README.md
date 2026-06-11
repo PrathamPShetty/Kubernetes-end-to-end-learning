@@ -145,7 +145,7 @@ minikube addons enable metrics-server
 
 ```bash
 # Clone the repo
-git clone https://github.com/<your-username>/Kubernetes-end-to-end-learning.git
+git clone https://github.com/PrathamPShetty/Kubernetes-end-to-end-learning.git
 cd Kubernetes-end-to-end-learning
 
 # Deploy everything with one command
